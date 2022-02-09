@@ -36,17 +36,13 @@ namespace fudi_web_api.Areas.Api.Controllers
 
         // GET api/<UsersController>/5
         [HttpGet("{id}")]
-        public string Get(string id)
-        {
-            return "value";
-        }
+        public async Task<string> Get(string id) => await _service.Get(id);
+        
 
         // POST api/<UsersController>
         [HttpPost]
-        public ActionResult<bool> Post([FromBody] User value)
-        {
-            return Ok(_service.Add(value));
-        }
+        public ActionResult<bool> Post([FromBody] User value) => Ok(_service.Add(value));
+        
 
         // PUT api/<UsersController>/5
         [HttpPut("{id}")]

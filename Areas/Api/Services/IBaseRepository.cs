@@ -8,7 +8,7 @@ namespace fudi_web_api.Areas.Api.Services
 {
     public interface IBaseRepository<T> where T : class, new()
     {
-        T Get(string record);
+        Task<string> Get(string record);
         List<T> GetAll();
         T Add(T record);
         bool Update(T record);

@@ -24,20 +24,18 @@ namespace fudi_web_api.Areas.Api.Services
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filepath);
             _fireStoreDb = FirestoreDb.Create("fudiapp");
         }
-        public T Get(string id)
+        public async Task<string> Get(string id)
         {
-            //DocumentReference docRef = _fireStoreDb.Collection(collection).WhereEqualTo("uid", id);
-            DocumentSnapshot snapshot = docRef.GetSnapshotAsync().GetAwaiter().GetResult();
-            if (snapshot.Exists)
+            CollectionReference colRef = _fireStoreDb.Collection(collection);
+            Query query = colRef.WhereEqualTo("uid", id);
+            QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
+            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
             {
-                T usr = snapshot.ConvertTo<T>();
-                //usr.Id = snapshot.Id;
-                return usr;
+                Dictionary<string, object> data = documentSnapshot.ToDictionary();
+                string json = JsonConvert.SerializeObject(data);
+                return json;
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         public List<T> GetAll()
