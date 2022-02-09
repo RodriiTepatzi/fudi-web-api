@@ -26,7 +26,7 @@ namespace fudi_web_api.Areas.Api.Services
         }
         public T Get(string id)
         {
-            DocumentReference docRef = _fireStoreDb.Collection(collection).WhereEqualTo("uid", id);
+            //DocumentReference docRef = _fireStoreDb.Collection(collection).WhereEqualTo("uid", id);
             DocumentSnapshot snapshot = docRef.GetSnapshotAsync().GetAwaiter().GetResult();
             if (snapshot.Exists)
             {
