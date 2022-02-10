@@ -46,15 +46,11 @@ namespace fudi_web_api.Areas.Api.Controllers
 
         // PUT api/<UsersController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(string id, [FromBody] User value)
-        {
-            return Ok(_service.Update(id, value));
-        }
+        public ActionResult Put(string id, [FromBody] User value) => Ok(_service.Update(id, value));
+
 
         // DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        public ActionResult Delete(string id) => Ok(_service.Delete(id));
     }
 }

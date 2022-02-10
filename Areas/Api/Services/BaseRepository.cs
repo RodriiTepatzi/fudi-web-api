@@ -84,9 +84,22 @@ namespace fudi_web_api.Areas.Api.Services
             return true;
         }
 
-        public bool Delete(T record)
+        public bool Delete(string id)
         {
-            throw new NotImplementedException();
+            CollectionReference colRef = _fireStoreDb.Collection(collection);
+            Query query = colRef.WhereEqualTo("uid", id);
+            QuerySnapshot querySnapshot = query.GetSnapshotAsync().GetAwaiter().GetResult();
+            string idDocument = "";
+
+            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
+            {
+                idDocument = documentSnapshot.Id;
+            }
+
+            DocumentReference recordRef = _fireStoreDb.Collection(collection).Document(idDocument);
+            recordRef.DeleteAsync().GetAwaiter().GetResult();
+
+            return true;
         }
     }
 }
