@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace fudi_web_api.Areas.Api.Services
@@ -65,9 +66,22 @@ namespace fudi_web_api.Areas.Api.Services
             return record;
         }
 
-        public bool Update(T record)
+        public bool Update(string id, T values)
         {
-            throw new NotImplementedException();
+            CollectionReference colRef = _fireStoreDb.Collection(collection);
+            Query query = colRef.WhereEqualTo("uid", id);
+            QuerySnapshot querySnapshot = query.GetSnapshotAsync().GetAwaiter().GetResult();
+            string idDocument = "";
+
+            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
+            {
+                idDocument = documentSnapshot.Id;
+            }
+
+            DocumentReference recordRef = _fireStoreDb.Collection(collection).Document(idDocument);
+            recordRef.SetAsync(values, SetOptions.Overwrite).GetAwaiter().GetResult();
+
+            return true;
         }
 
         public bool Delete(T record)
