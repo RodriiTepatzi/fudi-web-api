@@ -25,6 +25,7 @@ namespace fudi_web_api.Areas.Api.Services
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filepath);
             _fireStoreDb = FirestoreDb.Create("fudiapp");
         }
+
         public async Task<string> Get(string id)
         {
             CollectionReference colRef = _fireStoreDb.Collection(collection);

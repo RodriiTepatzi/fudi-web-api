@@ -12,6 +12,6 @@ namespace fudi_web_api.Areas.Api.Services
         List<T> GetAll();
         T Add(T record);
         bool Update(string id, T values);
-        bool Delete(T record);
+        bool Delete(string record);
     }
 }

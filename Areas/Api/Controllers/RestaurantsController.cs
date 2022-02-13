@@ -1,5 +1,7 @@
 ﻿using fudi_web_api.Areas.Api.Services;
+using fudi_web_api.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,37 +15,40 @@ namespace fudi_web_api.Areas.Api.Controllers
     [ApiController]
     public class RestaurantsController : ControllerBase
     {
+        private RestaurantsService _service = new RestaurantsService("restaurants");
+
         // Returns all the restaurants
         // GET: api/restaurants
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<string>> Get()
         {
-            return new string[] { "a", ""};
+            List<string> items = new List<string>();
+            List<Restaurant> restaurants = _service.GetAll();
+
+            foreach (var restaurant in restaurants)
+            {
+                restaurant.products = _service.GetProductsByRestaurantId(restaurant.uid);
+                string json = JsonConvert.SerializeObject(restaurant);
+                items.Add(json);
+            }
+
+            return items as IEnumerable<string>;
         }
 
         // GET api/<RestaurantsController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+        public async Task<string> Get(string id) => await _service.Get(id);
 
         // POST api/<RestaurantsController>
         [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
+        public ActionResult<bool> Post([FromBody] Restaurant restaurant) => Ok(_service.Add(restaurant));
 
         // PUT api/<RestaurantsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        public void Put(string id, [FromBody] Restaurant restaurant) => Ok(_service.Update(id, restaurant));
 
         // DELETE api/<RestaurantsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        public void Delete(string id) => Ok(_service.Delete(id));
     }
 }
