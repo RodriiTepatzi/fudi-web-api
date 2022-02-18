@@ -15,7 +15,7 @@ namespace fudi_web_api.Areas.Api.Services
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class, new()
     {
-        string filepath = "C:/Users/sprno/source/repos/fudi-web-api/fudiapp-firebase-adminsdk-8gwp6-561920ca6d.json";
+        string filepath = "fudiapp-firebase-adminsdk-8gwp6-561920ca6d.json";
         public FirestoreDb _fireStoreDb;
         string collection;
 
@@ -29,15 +29,11 @@ namespace fudi_web_api.Areas.Api.Services
         public async Task<string> Get(string id)
         {
             CollectionReference colRef = _fireStoreDb.Collection(collection);
-            Query query = colRef.WhereEqualTo("uid", id);
-            QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
-            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
-            {
-                Dictionary<string, object> data = documentSnapshot.ToDictionary();
-                string json = JsonConvert.SerializeObject(data);
-                return json;
-            }
-            return null;
+            DocumentReference documentReference = colRef.Document(id);
+            DocumentSnapshot documentSnapshot = documentReference.GetSnapshotAsync().GetAwaiter().GetResult();
+            Dictionary<string, object> data = documentSnapshot.ToDictionary();
+            string json = JsonConvert.SerializeObject(data);
+            return json;
         }
 
         public List<T> GetAll()
@@ -70,17 +66,8 @@ namespace fudi_web_api.Areas.Api.Services
         public bool Update(string id, T values)
         {
             CollectionReference colRef = _fireStoreDb.Collection(collection);
-            Query query = colRef.WhereEqualTo("uid", id);
-            QuerySnapshot querySnapshot = query.GetSnapshotAsync().GetAwaiter().GetResult();
-            string idDocument = "";
-
-            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
-            {
-                idDocument = documentSnapshot.Id;
-            }
-
-            DocumentReference recordRef = _fireStoreDb.Collection(collection).Document(idDocument);
-            recordRef.SetAsync(values, SetOptions.Overwrite).GetAwaiter().GetResult();
+            DocumentReference documentReference = colRef.Document(id);
+            documentReference.SetAsync(values, SetOptions.Overwrite).GetAwaiter();
 
             return true;
         }
@@ -88,17 +75,8 @@ namespace fudi_web_api.Areas.Api.Services
         public bool Delete(string id)
         {
             CollectionReference colRef = _fireStoreDb.Collection(collection);
-            Query query = colRef.WhereEqualTo("uid", id);
-            QuerySnapshot querySnapshot = query.GetSnapshotAsync().GetAwaiter().GetResult();
-            string idDocument = "";
-
-            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
-            {
-                idDocument = documentSnapshot.Id;
-            }
-
-            DocumentReference recordRef = _fireStoreDb.Collection(collection).Document(idDocument);
-            recordRef.DeleteAsync().GetAwaiter().GetResult();
+            DocumentReference documentReference = colRef.Document(id);
+            documentReference.DeleteAsync().GetAwaiter().GetResult();
 
             return true;
         }

@@ -41,7 +41,7 @@ namespace fudi_web_api.Areas.Api.Controllers
 
         // POST api/<UsersController>
         [HttpPost]
-        public ActionResult<bool> Post([FromBody] User value) => Ok(_service.Add(value));
+        public ActionResult<bool> Post([FromBody] User value) => Ok(_service.AddUser(value));
         
 
         // PUT api/<UsersController>/5
