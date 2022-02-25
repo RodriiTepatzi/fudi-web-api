@@ -39,13 +39,6 @@ namespace fudi_web_api.Areas.Api.Services
             return data;
         }
 
-        public string AddProductToRestaurant(string uid, Product product)
-        {
-            CollectionReference prodRef = _fireStoreDb.Collection("restaurants/" + uid + "/products");
-            string json = JsonConvert.SerializeObject(product);
-            DocumentReference documentReference = prodRef.AddAsync(json).GetAwaiter().GetResult();
-
-            return json;
-        }
+        
     }
 }
