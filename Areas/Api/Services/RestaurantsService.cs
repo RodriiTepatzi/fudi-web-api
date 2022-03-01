@@ -15,22 +15,6 @@ namespace fudi_web_api.Areas.Api.Services
             
         }
 
-        public List<Product> GetProductsByRestaurantId (string uid)
-        {
-            List<Product> products = new List<Product>();
-            CollectionReference prodRef = _fireStoreDb.Collection("restaurants/" + uid + "/products");
-            QuerySnapshot snapshot = prodRef.GetSnapshotAsync().GetAwaiter().GetResult();
-            foreach (DocumentSnapshot document in snapshot.Documents)
-            {
-                Dictionary<string, object> data = document.ToDictionary();
-                string json = JsonConvert.SerializeObject(data);
-                Product newItem = JsonConvert.DeserializeObject<Product>(json);
-                products.Add(newItem);
-            }
-
-            return products;
-        }
-
         public Restaurant AddRestaurant(Restaurant data)
         {
             CollectionReference resRef = _fireStoreDb.Collection("restaurants");

@@ -20,14 +20,15 @@ namespace fudi_web_api.Areas.Api.Controllers
         // Returns all the restaurants
         // GET: api/restaurants
         [HttpGet]
-        public async Task<IEnumerable<string>> Get()
+        public IEnumerable<string> Get()
         {
             List<string> items = new List<string>();
             List<Restaurant> restaurants = _service.GetAll();
 
             foreach (var restaurant in restaurants)
             {
-                restaurant.products = _service.GetProductsByRestaurantId(restaurant.uid);
+                // In case needed. However products will be get separately in the application to avoid errors.
+                //restaurant.products = _service.GetProductsByRestaurantId(restaurant.uid);
                 string json = JsonConvert.SerializeObject(restaurant);
                 items.Add(json);
             }
