@@ -10,9 +10,10 @@ namespace fudi_web_api.Areas.Api.Services
 {
     public class RestaurantsService : BaseRepository<Restaurant>
     {
+        private string route;
         public RestaurantsService(string route) : base(route)
         {
-            
+            this.route = route;
         }
 
         public Restaurant AddRestaurant(Restaurant data)
@@ -23,6 +24,12 @@ namespace fudi_web_api.Areas.Api.Services
             return data;
         }
 
+        public List<Restaurant> RestaurantsByCategory(List<string> category)
+        {
+            Query query = _fireStoreDb.Collection(route).WhereIn(nameof(Restaurant.category), category);
+            
+            return QueryRecords(query);
+        }
         
     }
 }

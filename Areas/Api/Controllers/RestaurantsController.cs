@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace fudi_web_api.Areas.Api.Controllers
 {
-    [Route("api/restaurants")]
+    [Route("api/v1/restaurants")]
     [ApiController]
     public class RestaurantsController : ControllerBase
     {
@@ -39,6 +39,22 @@ namespace fudi_web_api.Areas.Api.Controllers
         // GET api/<RestaurantsController>/5
         [HttpGet("{id}")]
         public async Task<string> Get(string id) => await _service.Get(id);
+
+        [HttpGet("category/{id}")]
+        public  IEnumerable<string> GetCategory(string id) {
+            List<string> items = new List<string>();
+            List<Restaurant> restaurants = _service.RestaurantsByCategory(new List<string> { id });
+
+            foreach (var restaurant in restaurants)
+            {
+                // In case needed. However products will be get separately in the application to avoid errors.
+                //restaurant.products = _service.GetProductsByRestaurantId(restaurant.uid);
+                string json = JsonConvert.SerializeObject(restaurant);
+                items.Add(json);
+            }
+
+            return items as IEnumerable<string>;
+        }
 
         // POST api/<RestaurantsController>
         [HttpPost]

@@ -63,6 +63,25 @@ namespace fudi_web_api.Areas.Api.Services
             return record;
         }
 
+
+
+        public List<T> QueryRecords(Query query)
+        {
+            QuerySnapshot querySnapshot = query.GetSnapshotAsync().GetAwaiter().GetResult();
+            List<T> list = new List<T>();
+            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
+            {
+                if (documentSnapshot.Exists)
+                {
+                    Dictionary<string, object> city = documentSnapshot.ToDictionary();
+                    string json = JsonConvert.SerializeObject(city);
+                    T newItem = JsonConvert.DeserializeObject<T>(json);
+                    list.Add(newItem);
+                }
+            }
+            return list;
+        }
+
         public bool Update(string id, T values)
         {
             CollectionReference colRef = _fireStoreDb.Collection(collection);

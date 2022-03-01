@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace fudi_web_api.Areas.Api.Controllers
 {
-    [Route("api/users")]
+    [Route("api/v1/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
