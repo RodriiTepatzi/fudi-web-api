@@ -58,7 +58,7 @@ namespace fudi_web_api.Areas.Api.Controllers
 
         // POST api/<RestaurantsController>
         [HttpPost]
-        public ActionResult<bool> Post([FromBody] Restaurant restaurant) => Ok(_service.Add(restaurant));
+        public ActionResult<bool> Post([FromBody] Restaurant restaurant) => Ok(_service.AddRestaurant(restaurant));
 
         // PUT api/<RestaurantsController>/5
         [HttpPut("{id}")]

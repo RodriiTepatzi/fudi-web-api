@@ -38,7 +38,22 @@ namespace fudi_web_api.Models
         [FirestoreProperty]
         public string startDate { get; set; }
 
-        [FirestoreProperty]
         public List<Product> products { get; set; }
+
+        public Dictionary<string, string> ToMap()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("uid", this.uid);
+            data.Add("restaurantName", this.restaurantName);
+            data.Add("restaurantAddress", this.restaurantAddress);
+            data.Add("restaurantSlogan", this.restaurantSlogan);
+            data.Add("restaurantUrl", this.restaurantUrl);
+            data.Add("stars", this.stars);
+            data.Add("cost", this.cost);
+            data.Add("category", this.category);
+            data.Add("startDate", this.startDate);
+
+            return data;
+        }
     }
 }

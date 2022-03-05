@@ -19,7 +19,10 @@ namespace fudi_web_api.Areas.Api.Services
         public Restaurant AddRestaurant(Restaurant data)
         {
             CollectionReference resRef = _fireStoreDb.Collection("restaurants");
-            DocumentReference documentReference = resRef.AddAsync(data).GetAwaiter().GetResult();
+            //DocumentReference documentReference = resRef.AddAsync(data.ToMap()).GetAwaiter().GetResult();
+            DocumentReference documentReference = resRef.Document();
+            data.uid = documentReference.Id;
+            documentReference.SetAsync(data.ToMap());
 
             return data;
         }
