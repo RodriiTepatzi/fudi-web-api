@@ -31,6 +31,10 @@ namespace fudi_web_api.Areas.Api.Services
                 if (documentSnapshot.Exists)
                 {
                     Dictionary<string, object> data = documentSnapshot.ToDictionary();
+                    data["closedDate"] = DateTime.ParseExact(data["closedDate"].ToString().Replace("Timestamp:", "").Trim(),
+                        "yyyy-MM-ddTHH:mm:ssZ", null);
+                    data["openedDate"] = DateTime.ParseExact(data["openedDate"].ToString().Replace("Timestamp:", "").Trim(),
+                        "yyyy-MM-ddTHH:mm:ssZ", null);
                     string json = JsonConvert.SerializeObject(data);
                     Cart newItem = JsonConvert.DeserializeObject<Cart>(json);
                     
@@ -87,6 +91,8 @@ namespace fudi_web_api.Areas.Api.Services
                             if (item.Exists)
                             {
                                 Dictionary<string, object> restaurantData = item.ToDictionary();
+                                restaurantData["startDate"] = DateTime.ParseExact(restaurantData["startDate"].ToString().Replace("Timestamp:", "").Trim(),
+                                    "yyyy-MM-ddTHH:mm:ssZ", null);
                                 string jsonRestaurantData = JsonConvert.SerializeObject(restaurantData);
                                 Restaurant restaurant = JsonConvert.DeserializeObject<Restaurant>(jsonRestaurantData);
                                 orderItem.restaurant = restaurant;
@@ -128,8 +134,29 @@ namespace fudi_web_api.Areas.Api.Services
             DocumentReference userDocument = usersCollection.Document(id);
             CollectionReference cartCollection = userDocument.Collection("cart");
             DocumentReference cartReference = cartCollection.Document(cart.uid);
-            cartReference.SetAsync(cart).GetAwaiter();
-
+            cartReference.UpdateAsync(cart.ToMap()).GetAwaiter();
+            foreach (var order in cart.orders)
+            {
+                CollectionReference cartOrdersCollectionReference = cartReference.Collection("orders");
+                DocumentReference orderDocumentReference = cartOrdersCollectionReference.Document(order.id);
+                orderDocumentReference.SetAsync(order.ToMap()).GetAwaiter();
+                foreach (var orderItem in order.orderItems)
+                {
+                    CollectionReference cartOrderItemsCollectionReference = orderDocumentReference.Collection("orderItems");
+                    DocumentReference orderItemDocumentReference = cartOrderItemsCollectionReference.Document(order.id);
+                    orderItemDocumentReference.SetAsync(orderItem.ToMap()).GetAwaiter();
+                    CollectionReference productsCollectionReference = orderItemDocumentReference.Collection("products");
+                    CollectionReference restaurantCollectionReference = orderItemDocumentReference.Collection("restaurant");
+                    restaurantCollectionReference.Document(orderItem.restaurant.uid).SetAsync(orderItem.restaurant.ToMap()).GetAwaiter();
+                    foreach (var orderProduct in orderItem.products) 
+                    {
+                        DocumentReference orderProductReference = productsCollectionReference.Document(orderProduct.id);
+                        orderProductReference.UpdateAsync(orderProduct.ToMap()).GetAwaiter();
+                        CollectionReference finalProductCollection = orderProductReference.Collection("product");
+                        finalProductCollection.Document(orderProduct.product.productId).SetAsync(orderProduct.product.ToMap()).GetAwaiter();
+                    }
+                }
+            }
 
             return cart;
         }

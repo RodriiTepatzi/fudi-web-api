@@ -28,6 +28,6 @@ namespace fudi_web_api.Models
         public string email { get; set; }
 
         [FirestoreProperty]
-        public string birthday { get; set; }
+        public DateTime birthday { get; set; }
     }
 }

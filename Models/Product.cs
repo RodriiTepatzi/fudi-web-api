@@ -18,20 +18,20 @@ namespace fudi_web_api.Models
         public string productDescription { get; set; }
 
         [FirestoreProperty]
-        public string productPrice { get; set; }
+        public double productPrice { get; set; }
 
         [FirestoreProperty]
         public string productUrl { get; set; }
 
         [FirestoreProperty]
-        public string productLikes { get; set; }
+        public int productLikes { get; set; }
 
         [FirestoreProperty]
         public string productUnit { get; set; } 
 
-        public Dictionary<string, string> ToMap()
+        public Dictionary<string, object> ToMap()
         {
-            Dictionary<string, string> data = new Dictionary<string, string>();
+            Dictionary<string, object> data = new Dictionary<string, object>();
             data.Add("productId", this.productId);
             data.Add("productName", this.productName);
             data.Add("productDescription", this.productDescription);

@@ -45,10 +45,8 @@ namespace fudi_web_api.Areas.Api.Controllers
         }
 
         // PUT api/<CartController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        [HttpPut("{id}/cart")]
+        public IActionResult Put(string id, [FromBody] Cart value) => Ok(_service.UpdateCart(id, value));
 
         // DELETE api/<CartController>/5
         [HttpDelete("{id}")]

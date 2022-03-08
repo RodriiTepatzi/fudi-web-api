@@ -24,7 +24,7 @@ namespace fudi_web_api.Models
         public string restaurantSlogan { get; set; }
 
         [FirestoreProperty]
-        public string stars { get; set; }
+        public int stars { get; set; }
 
         [FirestoreProperty]
         public string cost { get; set; }
@@ -36,13 +36,13 @@ namespace fudi_web_api.Models
         public string status { get; set; }
 
         [FirestoreProperty]
-        public string startDate { get; set; }
+        public DateTime startDate { get; set; }
 
         public List<Product> products { get; set; }
 
-        public Dictionary<string, string> ToMap()
+        public Dictionary<string, object> ToMap()
         {
-            Dictionary<string, string> data = new Dictionary<string, string>();
+            Dictionary<string, object> data = new Dictionary<string, object>();
             data.Add("uid", this.uid);
             data.Add("restaurantName", this.restaurantName);
             data.Add("restaurantAddress", this.restaurantAddress);
@@ -51,7 +51,7 @@ namespace fudi_web_api.Models
             data.Add("stars", this.stars);
             data.Add("cost", this.cost);
             data.Add("category", this.category);
-            data.Add("startDate", this.startDate);
+            data.Add("startDate", Timestamp.FromDateTime(DateTime.SpecifyKind(this.startDate, DateTimeKind.Utc)));
 
             return data;
         }
