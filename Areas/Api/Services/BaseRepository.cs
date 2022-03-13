@@ -2,6 +2,7 @@
 using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
+using fudi_web_api.Models;
 using Google.Cloud.Firestore;
 using Newtonsoft.Json;
 using System;

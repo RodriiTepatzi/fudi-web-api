@@ -30,8 +30,43 @@ namespace fudi_web_api.Areas.Api.Services
         public List<Restaurant> RestaurantsByCategory(List<string> category)
         {
             Query query = _fireStoreDb.Collection(route).WhereIn(nameof(Restaurant.category), category);
-            
-            return QueryRecords(query);
+            QuerySnapshot querySnapshot = query.GetSnapshotAsync().GetAwaiter().GetResult();
+            List<Restaurant> list = new List<Restaurant>();
+            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
+            {
+                if (documentSnapshot.Exists)
+                {
+                    Dictionary<string, object> data = documentSnapshot.ToDictionary();
+                    data["startDate"] = DateTime.ParseExact(data["startDate"].ToString().Replace("Timestamp:", "").Trim(),
+                        "yyyy-MM-ddTHH:mm:ssZ", null);
+                    string json = JsonConvert.SerializeObject(data);
+                    Restaurant newItem = JsonConvert.DeserializeObject<Restaurant>(json);
+                    list.Add(newItem);
+                }
+            }
+            return list;
+        }
+
+        public List<Restaurant> GetAllRestaurants()
+        {
+            Query query = _fireStoreDb.Collection("restaurants");
+            QuerySnapshot querySnapshot = query.GetSnapshotAsync().GetAwaiter().GetResult();
+            List<Restaurant> list = new List<Restaurant>();
+
+            foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
+            {
+                if (documentSnapshot.Exists)
+                {
+                    Dictionary<string, object> data = documentSnapshot.ToDictionary();
+                    data["startDate"] = DateTime.ParseExact(data["startDate"].ToString().Replace("Timestamp:", "").Trim(),
+                        "yyyy-MM-ddTHH:mm:ssZ", null);
+                    string json = JsonConvert.SerializeObject(data);
+                    Restaurant newItem = JsonConvert.DeserializeObject<Restaurant>(json);
+                    list.Add(newItem);
+                }
+            }
+
+            return list;
         }
         
     }

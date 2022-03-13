@@ -23,7 +23,7 @@ namespace fudi_web_api.Areas.Api.Controllers
         public IEnumerable<string> Get()
         {
             List<string> items = new List<string>();
-            List<Restaurant> restaurants = _service.GetAll();
+            List<Restaurant> restaurants = _service.GetAllRestaurants();
 
             foreach (var restaurant in restaurants)
             {
