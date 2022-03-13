@@ -30,28 +30,5 @@ namespace fudi_web_api.Areas.Api.Controllers
             }
             return data as IEnumerable<string>;
         }
-
-        // GET api/<CartController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<CartController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<CartController>/5
-        [HttpPut("{id}/cart")]
-        public IActionResult Put(string id, [FromBody] Cart value) => Ok(_service.UpdateCart(id, value));
-
-        // DELETE api/<CartController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
