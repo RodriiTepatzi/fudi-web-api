@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -22,7 +23,7 @@ namespace fudi_web_api.Areas.Api.Controllers
         public async Task<IEnumerable<string>> Get()
         {
             List<string> items = new List<string>();
-            List<Models.User> users = _service.GetAll();
+            List<User> users = _service.GetAll();
             
             foreach (var user in users)
             {
@@ -32,6 +33,44 @@ namespace fudi_web_api.Areas.Api.Controllers
 
 
             return items as IEnumerable<string>;
+        }
+
+        [HttpGet("telephone/{number}")]
+        public async Task<string> GetByNumber(string number) {
+            string newNumber = "";
+            if (number.Length == 12)
+            {
+                newNumber = "+" + Regex.Replace(number, @"(\d{2})(\d{3})(\d{3})(\d{4})", "$1 $2-$3-$4").ToString();
+            }
+            else if (number.Length == 11)
+            {
+                newNumber = "+" + Regex.Replace(number, @"(\d{1})(\d{3})(\d{3})(\d{4})", "$1 $2-$3-$4").ToString();
+            }
+            
+            List<string> items = new List<string>();
+            List<User> users = _service.GetUserByNumber(new List<string> { newNumber });
+            foreach (var user in users)
+            {
+                string json = JsonConvert.SerializeObject(user);
+                items.Add(json);
+            }
+
+            return items.Count > 0 ? items[0] as string : null;
+        }
+
+        [HttpGet("username/{username}")]
+        public async Task<string> GetByUsername(string username)
+        {
+
+            List<string> items = new List<string>();
+            List<User> users = _service.GetUserByUsername(new List<string> { username });
+            foreach (var user in users)
+            {
+                string json = JsonConvert.SerializeObject(user);
+                items.Add(json);
+            }
+
+            return items.Count > 0 ? items[0] as string : null;
         }
 
         // GET api/<UsersController>/5

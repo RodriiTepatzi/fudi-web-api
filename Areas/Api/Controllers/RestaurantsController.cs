@@ -32,7 +32,7 @@ namespace fudi_web_api.Areas.Api.Controllers
                 string json = JsonConvert.SerializeObject(restaurant);
                 items.Add(json);
             }
-
+            
             return items as IEnumerable<string>;
         }
 
