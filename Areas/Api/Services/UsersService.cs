@@ -26,6 +26,22 @@ namespace fudi_web_api.Areas.Api.Services
             
             return record;
         }
+        public async Task<string> GetUserById(string id)
+        {
+            CollectionReference colRef = _fireStoreDb.Collection(route);
+            DocumentReference documentReference = colRef.Document(id);
+            DocumentSnapshot documentSnapshot = documentReference.GetSnapshotAsync().GetAwaiter().GetResult();
+            if (documentSnapshot.Exists)
+            {
+                Dictionary<string, object> data = documentSnapshot.ToDictionary();
+                data["birthday"] = DateTime.ParseExact(data["birthday"].ToString().Replace("Timestamp:", "").Trim(),
+                            "yyyy-MM-ddTHH:mm:ssZ", null);
+                string json = JsonConvert.SerializeObject(data);
+                return json;
+            }
+            
+            return null;
+        }
 
         public List<User> GetUserByNumber(List<string> number)
         {

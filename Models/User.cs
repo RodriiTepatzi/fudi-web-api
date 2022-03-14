@@ -29,5 +29,19 @@ namespace fudi_web_api.Models
 
         [FirestoreProperty]
         public DateTime birthday { get; set; }
+
+        public Dictionary<string, object> ToMap()
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("uid", this.uid);
+            data.Add("username", this.username);
+            data.Add("telephone", this.telephone);
+            data.Add("photoURL", this.photoURL);
+            data.Add("fullname", this.fullname);
+            data.Add("email", this.email);
+            data.Add("birthday", Timestamp.FromDateTime(DateTime.SpecifyKind(this.birthday, DateTimeKind.Utc)));
+
+            return data;
+        }
     }
 }

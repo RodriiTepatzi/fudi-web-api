@@ -75,7 +75,7 @@ namespace fudi_web_api.Areas.Api.Controllers
 
         // GET api/<UsersController>/5
         [HttpGet("{id}")]
-        public async Task<string> Get(string id) => await _service.Get(id);
+        public async Task<string> Get(string id) => await _service.GetUserById(id);
         
 
         // POST api/<UsersController>
