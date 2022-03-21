@@ -160,5 +160,61 @@ namespace fudi_web_api.Areas.Api.Services
 
             return cart;
         }
+
+        public Order AddOrder(string id, Order order)
+        {
+            CollectionReference usersCollection = _fireStoreDb.Collection(route);
+            DocumentReference userDocument = usersCollection.Document(id);
+            CollectionReference cartReference = userDocument.Collection("cart");
+            QuerySnapshot cartSnapshot = cartReference.GetSnapshotAsync().GetAwaiter().GetResult();
+            string cartId = "";
+            foreach (var document in cartSnapshot)
+            {
+                cartId = document.Id;
+            }
+            DocumentReference cartDocument = cartReference.Document(cartId);
+            CollectionReference ordersCollection = cartDocument.Collection("orders");
+            DocumentReference orderDocument = ordersCollection.Document();
+            order.id = orderDocument.Id;
+            orderDocument.CreateAsync(order.ToMap()).GetAwaiter();
+            CollectionReference orderItems = orderDocument.Collection("orderItems");
+            foreach (var orderItem in order.orderItems)
+            {
+                DocumentReference orderItemDocumentReference = orderItems.Document();
+                orderItem.id = orderItemDocumentReference.Id;
+                orderItemDocumentReference.CreateAsync(orderItem.ToMap());
+                CollectionReference productsReference = orderItemDocumentReference.Collection("products");
+                CollectionReference restaurantCollectionReference = orderItemDocumentReference.Collection("restaurant");
+                restaurantCollectionReference.Document(orderItem.restaurant.uid).SetAsync(orderItem.restaurant.ToMap()).GetAwaiter();
+                foreach (var orderProduct in orderItem.products)
+                {
+                    DocumentReference orderProductDocumentReference = productsReference.Document();
+                    orderProduct.id = orderProductDocumentReference.Id;
+                    orderProductDocumentReference.CreateAsync(orderProduct.ToMap());
+                    CollectionReference finalProductCollection = orderProductDocumentReference.Collection("product");
+                    finalProductCollection.Document(orderProduct.product.productId).SetAsync(orderProduct.product.ToMap()).GetAwaiter();
+                }
+            }
+            
+            return order;
+        }
+
+        public bool DeleteOrderById(string id)
+        {
+            CollectionReference usersCollection = _fireStoreDb.Collection(route);
+            DocumentReference userDocument = usersCollection.Document(id);
+            CollectionReference cartReference = userDocument.Collection("cart");
+            QuerySnapshot cartSnapshot = cartReference.GetSnapshotAsync().GetAwaiter().GetResult();
+            string cartId = "";
+            foreach (var document in cartSnapshot)
+            {
+                cartId = document.Id;
+            }
+            DocumentReference cartDocument = cartReference.Document(cartId);
+            CollectionReference ordersCollection = cartDocument.Collection("orders");
+            ordersCollection.Document(id).DeleteAsync().GetAwaiter();
+
+            return true;
+        }
     }
 }

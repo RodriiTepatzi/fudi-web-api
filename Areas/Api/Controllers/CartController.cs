@@ -30,5 +30,15 @@ namespace fudi_web_api.Areas.Api.Controllers
             }
             return data as IEnumerable<string>;
         }
+
+        [HttpPost("{id}/cart/add")]
+        public ActionResult AddOrder(string id, [FromBody] Order order) => Ok(_service.AddOrder(id, order));
+
+        [HttpPost("{id}/cart/order/add-item")]
+        public ActionResult AddOrderItem(string id, [FromBody] Order order) => Ok(_service.AddOrder(id, order));
+
+
+        [HttpPost("{id}/cart/delete")]
+        public ActionResult DeleteOrder(string id) => Ok(_service.DeleteOrderById(id));
     }
 }
