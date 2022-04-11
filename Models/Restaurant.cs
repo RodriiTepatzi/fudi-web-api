@@ -50,6 +50,7 @@ namespace fudi_web_api.Models
             data.Add("restaurantUrl", this.restaurantUrl);
             data.Add("stars", this.stars);
             data.Add("cost", this.cost);
+            data.Add("status", this.status);
             data.Add("category", this.category);
             data.Add("startDate", Timestamp.FromDateTime(DateTime.SpecifyKind(this.startDate, DateTimeKind.Utc)));
 

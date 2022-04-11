@@ -11,6 +11,7 @@ namespace fudi_web_api.Areas.Api.Services
     public class RestaurantsService : BaseRepository<Restaurant>
     {
         private string route;
+        private ProductsService _service = new ProductsService("restaurants");
         public RestaurantsService(string route) : base(route)
         {
             this.route = route;
@@ -62,6 +63,7 @@ namespace fudi_web_api.Areas.Api.Services
                         "yyyy-MM-ddTHH:mm:ssZ", null);
                     string json = JsonConvert.SerializeObject(data);
                     Restaurant newItem = JsonConvert.DeserializeObject<Restaurant>(json);
+                    newItem.products = _service.GetAllProducts(newItem.uid);
                     list.Add(newItem);
                 }
             }

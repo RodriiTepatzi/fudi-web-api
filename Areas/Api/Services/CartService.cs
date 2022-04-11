@@ -124,7 +124,6 @@ namespace fudi_web_api.Areas.Api.Services
                     }
                 }
             }
-
             return carts;
         }
 
@@ -199,7 +198,7 @@ namespace fudi_web_api.Areas.Api.Services
             return order;
         }
 
-        public bool DeleteOrderById(string id)
+        public bool DeleteOrderById(string id, string restaurantId)
         {
             CollectionReference usersCollection = _fireStoreDb.Collection(route);
             DocumentReference userDocument = usersCollection.Document(id);
@@ -212,9 +211,111 @@ namespace fudi_web_api.Areas.Api.Services
             }
             DocumentReference cartDocument = cartReference.Document(cartId);
             CollectionReference ordersCollection = cartDocument.Collection("orders");
-            ordersCollection.Document(id).DeleteAsync().GetAwaiter();
+            Query ordersSnapshots = ordersCollection.WhereIn("restaurantId", new List<string> { restaurantId });
+            QuerySnapshot snapshot = ordersSnapshots.GetSnapshotAsync().GetAwaiter().GetResult();
+            foreach (var orderDocument in snapshot)
+            {
+                CollectionReference orderItemsCollection = orderDocument.Reference.Collection("orderItems");
+                orderDocument.Reference.DeleteAsync().GetAwaiter();
+                DeleteCollection(orderItemsCollection, 5).GetAwaiter();
+                foreach (var orderItem in orderItemsCollection.GetSnapshotAsync().GetAwaiter().GetResult())
+                {
+                    CollectionReference productsCollectionReference = orderItem.Reference.Collection("products");
+                    DeleteCollection(productsCollectionReference, 5).GetAwaiter();
+                    DeleteCollection(orderItem.Reference.Collection("restaurant"), 1).GetAwaiter();
 
+                    foreach (var product in productsCollectionReference.GetSnapshotAsync().GetAwaiter().GetResult())
+                    {
+                        DeleteCollection(product.Reference.Collection("product"), 1).GetAwaiter().GetResult();
+                    }
+                }
+            }
             return true;
+        }
+
+
+        public OrderProduct AddProductToOrder(string id, string restaurantId, OrderProduct orderProduct)
+        {
+            CollectionReference usersCollection = _fireStoreDb.Collection(route);
+            DocumentReference userDocument = usersCollection.Document(id);
+            CollectionReference cartReference = userDocument.Collection("cart");
+            QuerySnapshot cartSnapshot = cartReference.GetSnapshotAsync().GetAwaiter().GetResult();
+            string cartId = "";
+            foreach (var document in cartSnapshot)
+            {
+                cartId = document.Id;
+            }
+            DocumentReference cartDocument = cartReference.Document(cartId);
+            CollectionReference ordersCollection = cartDocument.Collection("orders");
+            Query ordersSnapshots = ordersCollection.WhereIn("restaurantId", new List<string> { restaurantId });
+            QuerySnapshot snapshot = ordersSnapshots.GetSnapshotAsync().GetAwaiter().GetResult();
+            foreach (var orderDocument in snapshot)
+            {
+                CollectionReference orderItemCollectionReference = orderDocument.Reference.Collection("orderItems");
+                foreach (var orderItemDocument in orderItemCollectionReference.GetSnapshotAsync().GetAwaiter().GetResult())
+                {
+                    DocumentReference orderItemDocumentReference = orderItemDocument.Reference;
+                    CollectionReference productsReference = orderItemDocumentReference.Collection("products");
+                    DocumentReference orderProductDocumentReference = productsReference.Document();
+                    orderProduct.id = orderProductDocumentReference.Id;
+                    orderProductDocumentReference.CreateAsync(orderProduct.ToMap());
+                    CollectionReference finalProductCollection = orderProductDocumentReference.Collection("product");
+                    finalProductCollection.Document(orderProduct.product.productId).CreateAsync(orderProduct.product.ToMap()).GetAwaiter();
+                }
+            }
+            return orderProduct;
+        }
+
+        public OrderProduct UpdateQuantityProduct(string id, string restaurantId, OrderProduct orderProduct)
+        {
+            CollectionReference usersCollection = _fireStoreDb.Collection(route);
+            DocumentReference userDocument = usersCollection.Document(id);
+            CollectionReference cartReference = userDocument.Collection("cart");
+            QuerySnapshot cartSnapshot = cartReference.GetSnapshotAsync().GetAwaiter().GetResult();
+            string cartId = "";
+            foreach (var document in cartSnapshot)
+            {
+                cartId = document.Id;
+            }
+            DocumentReference cartDocument = cartReference.Document(cartId);
+            CollectionReference ordersCollection = cartDocument.Collection("orders");
+            Query ordersSnapshots = ordersCollection.WhereIn("restaurantId", new List<string> { restaurantId });
+            QuerySnapshot snapshot = ordersSnapshots.GetSnapshotAsync().GetAwaiter().GetResult();
+            foreach (var orderDocument in snapshot)
+            {
+                CollectionReference orderItemCollectionReference = orderDocument.Reference.Collection("orderItems");
+                foreach (var orderItemDocument in orderItemCollectionReference.GetSnapshotAsync().GetAwaiter().GetResult())
+                {
+                    DocumentReference orderItemDocumentReference = orderItemDocument.Reference;
+                    CollectionReference productsReference = orderItemDocumentReference.Collection("products");
+                    foreach (var orderProductDocument in productsReference.GetSnapshotAsync().GetAwaiter().GetResult())
+                    {
+                        Query product = orderProductDocument.Reference.Collection("product").WhereIn("productId", new List<string>() {orderProduct.product.productId});
+                        foreach (var productItem in product.GetSnapshotAsync().GetAwaiter().GetResult())
+                        {
+                            DocumentReference orderProducToSet = productItem.Reference.Parent.Parent;
+                            orderProduct.id = orderProducToSet.Id;
+                            orderProducToSet.SetAsync(orderProduct.ToMap());
+                        }
+                    }
+                }
+            }
+            return orderProduct;
+        }
+
+        private static async Task DeleteCollection(CollectionReference collectionReference, int batchSize)
+        {
+            QuerySnapshot snapshot = await collectionReference.Limit(batchSize).GetSnapshotAsync();
+            IReadOnlyList<DocumentSnapshot> documents = snapshot.Documents;
+            while (documents.Count > 0)
+            {
+                foreach (DocumentSnapshot document in documents)
+                {
+                    await document.Reference.DeleteAsync();
+                }
+                snapshot = await collectionReference.Limit(batchSize).GetSnapshotAsync();
+                documents = snapshot.Documents;
+            }
         }
     }
 }

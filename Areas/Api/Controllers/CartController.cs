@@ -31,14 +31,16 @@ namespace fudi_web_api.Areas.Api.Controllers
             return data as IEnumerable<string>;
         }
 
-        [HttpPost("{id}/cart/add")]
+        [HttpPost("{id}/cart/addorder")]
         public ActionResult AddOrder(string id, [FromBody] Order order) => Ok(_service.AddOrder(id, order));
 
-        [HttpPost("{id}/cart/order/add-item")]
-        public ActionResult AddOrderItem(string id, [FromBody] Order order) => Ok(_service.AddOrder(id, order));
+        [HttpPost("{id}/cart/{restaurantId}/order/add-item")]
+        public ActionResult AddItemToOrder(string id, string restaurantId, [FromBody] OrderProduct orderProduct) => Ok(_service.AddProductToOrder(id, restaurantId, orderProduct));
 
+        [HttpDelete("{id}/cart/deleteorder/{restaurantId}")]
+        public ActionResult DeleteOrder(string id, string restaurantId) => Ok(_service.DeleteOrderById(id, restaurantId));
 
-        [HttpPost("{id}/cart/delete")]
-        public ActionResult DeleteOrder(string id) => Ok(_service.DeleteOrderById(id));
+        [HttpPut("{id}/cart/{restaurantId}/order/add-quantity")]
+        public ActionResult UpdateItemQuantity(string id, string restaurantId, [FromBody] OrderProduct orderProduct) => Ok(_service.UpdateQuantityProduct(id, restaurantId, orderProduct));
     }
 }

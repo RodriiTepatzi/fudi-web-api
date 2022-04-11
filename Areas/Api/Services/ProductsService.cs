@@ -29,6 +29,31 @@ namespace fudi_web_api.Areas.Api.Services
                     Dictionary<string, object> data = documentSnapshot.ToDictionary();
                     string json = JsonConvert.SerializeObject(data);
                     Product newItem = JsonConvert.DeserializeObject<Product>(json);
+                    newItem.requiredAddons = new List<Addon>();
+                    newItem.optionalAddons = new List<Addon>();
+                    CollectionReference requiredAddonsCollection = documentSnapshot.Reference.Collection("requiredAddons");
+                    CollectionReference optionalAddonsCollection = documentSnapshot.Reference.Collection("optionalAddons");
+                    foreach (var requiredAddonDocument in requiredAddonsCollection.GetSnapshotAsync().GetAwaiter().GetResult())
+                    {
+                        if (requiredAddonDocument.Exists)
+                        {
+                            Dictionary<string, object> addonDictionary = requiredAddonDocument.ToDictionary();
+                            string addonJson = JsonConvert.SerializeObject(addonDictionary);
+                            Addon addon = JsonConvert.DeserializeObject<Addon>(addonJson);
+                            newItem.requiredAddons.Add(addon);
+                        }
+                    }
+
+                    foreach (var optionalAddonDocument in optionalAddonsCollection.GetSnapshotAsync().GetAwaiter().GetResult())
+                    { 
+                        if (optionalAddonDocument.Exists)
+                        {
+                            Dictionary<string, object> addonDictionary = optionalAddonDocument.ToDictionary();
+                            string addonJson = JsonConvert.SerializeObject(addonDictionary);
+                            Addon addon = JsonConvert.DeserializeObject<Addon>(addonJson);
+                            newItem.optionalAddons.Add(addon);
+                        }
+                    }
                     list.Add(newItem);
                 }
             }

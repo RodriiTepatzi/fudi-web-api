@@ -27,7 +27,11 @@ namespace fudi_web_api.Models
         public int productLikes { get; set; }
 
         [FirestoreProperty]
-        public string productUnit { get; set; } 
+        public string productUnit { get; set; }
+
+        public List<Addon> requiredAddons { get; set; }
+        
+        public List<Addon> optionalAddons { get; set; }
 
         public Dictionary<string, object> ToMap()
         {
@@ -39,6 +43,8 @@ namespace fudi_web_api.Models
             data.Add("productUrl", this.productUrl);
             data.Add("productLikes", this.productLikes);
             data.Add("productUnit", this.productUnit);
+            data.Add("requiredAddons", this.requiredAddons);
+            data.Add("optionalAddons", this.optionalAddons);
 
             return data;
         }
